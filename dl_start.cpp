@@ -20,7 +20,7 @@ hash_digest derive_seed(const ec_point& pubkey)
 }
 
 // Encrypt for first hash.
-data_chunk pp_encrypt(data_chunk buffer, hash_digest seed)
+data_chunk dl_encrypt(data_chunk buffer, hash_digest seed)
 {
     aes256_context ctx; 
     BITCOIN_ASSERT(seed.size() == 32);
@@ -50,7 +50,7 @@ int main(int argc, char** argv)
 {
     if (argc != 3)
     {
-        std::cerr << "Usage: pp_start DOCUMENT CHUNKS" << std::endl;
+        std::cerr << "Usage: dl_start DOCUMENT CHUNKS" << std::endl;
         std::cerr << "Good default for CHUNKS is 100" << std::endl;
         return -1;
     }
@@ -65,7 +65,7 @@ int main(int argc, char** argv)
     }
     catch (const boost::bad_lexical_cast&)
     {
-        std::cerr << "pp_start: bad CHUNKS provided." << std::endl;
+        std::cerr << "dl_start: bad CHUNKS provided." << std::endl;
         return -1;
     }
     const fs::path public_chunks_path =
@@ -73,7 +73,7 @@ int main(int argc, char** argv)
 #if 0
     if (!fs::create_directory(public_chunks_path))
     {
-        std::cerr << "pp_start: error creating path '"
+        std::cerr << "dl_start: error creating path '"
             << public_chunks_path.native() << "'" << std::endl;
         return -1;
     }
@@ -118,7 +118,7 @@ int main(int argc, char** argv)
             extend_data(buffer, data_chunk(0, 16 - buffer.size()));
         }
         BITCOIN_ASSERT(buffer.size() >= 16);
-        data_chunk encrypted = pp_encrypt(buffer, seed);
+        data_chunk encrypted = dl_encrypt(buffer, seed);
         char* enc_data = reinterpret_cast<char*>(encrypted.data());
         outfile.write(enc_data, encrypted.size());
         test_decryption(buffer, encrypted, pubkey);

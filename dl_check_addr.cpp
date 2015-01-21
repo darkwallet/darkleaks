@@ -13,7 +13,7 @@ void tx_fetched(const std::error_code& ec, const transaction_type& tx)
 {
     if (ec)
     {
-        std::cerr << "pp_check_addr: Failed to fetch transaction: "
+        std::cerr << "dl_check_addr: Failed to fetch transaction: "
             << ec.message() << std::endl;
     }
     else
@@ -30,7 +30,7 @@ void tx_fetched(const std::error_code& ec, const transaction_type& tx)
             const ec_point& pubkey = input.script.operations().back().data;
             if (!verify_public_key(pubkey))
             {
-                std::cerr << "pp_check_addr: problem with pubkey...";
+                std::cerr << "dl_check_addr: problem with pubkey...";
                 stopped = true;
                 return;
             }
@@ -48,12 +48,12 @@ void history_fetched(
 {
     if (ec)
     {
-        std::cerr << "pp_check_addr: Failed to fetch history: "
+        std::cerr << "dl_check_addr: Failed to fetch history: "
             << ec.message() << std::endl;
     }
     else if (history.empty())
     {
-        std::cerr << "pp_check_addr: No history yet at this address."
+        std::cerr << "dl_check_addr: No history yet at this address."
             << std::endl;
     }
     else
@@ -67,7 +67,7 @@ void history_fetched(
                 return;
             }
         }
-        std::cerr << "pp_check_addr: No spends yet for this address. "
+        std::cerr << "dl_check_addr: No spends yet for this address. "
             "Keep bidding." << std::endl;
     }
     stopped = true;
@@ -77,12 +77,12 @@ int main(int argc, char** argv)
 {
     if (argc != 2)
     {
-        std::cerr << "Usage: pp_check_addr ADDRESS" << std::endl;
+        std::cerr << "Usage: dl_check_addr ADDRESS" << std::endl;
         return -1;
     }
     if (!payaddr.set_encoded(argv[1]))
     {
-        std::cerr << "pp_check_addr: invalid Bitcoin address." << std::endl;
+        std::cerr << "dl_check_addr: invalid Bitcoin address." << std::endl;
         return -1;
     }
     threadpool pool(1);

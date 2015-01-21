@@ -11,7 +11,7 @@ int main(int argc, char** argv)
 {
     if (argc != 3)
     {
-        std::cerr << "Usage: pp_secrets DOCUMENT CHUNKS" << std::endl;
+        std::cerr << "Usage: dl_secrets DOCUMENT CHUNKS" << std::endl;
         std::cerr << "Good default for CHUNKS is 100" << std::endl;
         return -1;
     }
@@ -26,7 +26,7 @@ int main(int argc, char** argv)
     }
     catch (const boost::bad_lexical_cast&)
     {
-        std::cerr << "pp_secrets: bad CHUNKS provided." << std::endl;
+        std::cerr << "dl_secrets: bad CHUNKS provided." << std::endl;
         return -1;
     }
     const fs::path public_chunks_path =
@@ -34,7 +34,7 @@ int main(int argc, char** argv)
 #if 0
     if (!fs::create_directory(public_chunks_path))
     {
-        std::cerr << "pp_secrets: error creating path '"
+        std::cerr << "dl_secrets: error creating path '"
             << public_chunks_path.native() << "'" << std::endl;
         return -1;
     }

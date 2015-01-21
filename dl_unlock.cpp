@@ -25,7 +25,7 @@ int main(int argc, char** argv)
 {
     if (argc != 4)
     {
-        std::cerr << "Usage: pp_unlock CHUNKFILE BLOCK_HASH PUBKEY"
+        std::cerr << "Usage: dl_unlock CHUNKFILE BLOCK_HASH PUBKEY"
             << std::endl;
         return -1;
     }
@@ -33,13 +33,13 @@ int main(int argc, char** argv)
     const data_chunk hash = decode_hex(argv[2]);
     if (hash.empty() || hash.size() != hash_size)
     {
-        std::cerr << "pp_unlock: not a valid BLOCK_HASH." << std::endl;
+        std::cerr << "dl_unlock: not a valid BLOCK_HASH." << std::endl;
         return -1;
     }
     const ec_point pubkey = decode_hex(argv[3]);
     if (pubkey.empty() || pubkey.size() != ec_compressed_size)
     {
-        std::cerr << "pp_unlock: not a valid PUBKEY." << std::endl;
+        std::cerr << "dl_unlock: not a valid PUBKEY." << std::endl;
         return -1;
     }
     std::ifstream infile(chunk_filename, std::ifstream::binary);
