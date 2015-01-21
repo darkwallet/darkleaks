@@ -1,0 +1,28 @@
+Imagine you want to release a file a group or person in exchange for BTC.
+(Note: you can redo this scheme for any number of groups effectively
+creating a parallel auction)
+
+You split the file into 100 chunks, and encrypt them using a hash based off the
+original chunk data.
+
+* Each chunk is hashed.
+* The hash becomes a Bitcoin private key.
+* We derive the public key.
+* The address for that pubkey is the chunk's release address.
+* We hash the public key to get a secret.
+* The chunk is encrypted using the secret with AES256.
+
+Spending from that address means you *must* reveal the public key.
+Revealing the public key means you reveal the secret.
+And so the chunk can be decrypted.
+
+Now in order to keep the leaker honest, before the initial release he
+announces a block height (in the future) at which he will unlock some chunks.
+These chunks are chosen based off the block hash at that height.
+By preannouncing sufficiently in advance, and giving a reasonable number
+of chunks to make public (say 20%), then 20% are chosen randomly using a
+provably fair system (the Bitcoin blockchain) and released.
+
+People can now vet the released chunks, pass their own judgement and decide
+whether to start bidding on the remaining chunks to unlock them.
+

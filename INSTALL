@@ -1,0 +1,13 @@
+Install the libbitcoin dependencies from:
+
+  http://github.com/libbitcoin/
+
+Will install the tools in your home directory. Be sure to follow the
+instructions at the end of the installation.
+
+Now you should be able to compile this project:
+
+  $ make
+
+See README for usage info.
+
