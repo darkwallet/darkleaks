@@ -2,7 +2,6 @@
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <bitcoin/bitcoin.hpp>
-#include <wallet/wallet.hpp>
 #include "aes256.h"
 using namespace bc;
 namespace fs = boost::filesystem;
@@ -51,7 +50,7 @@ int main(int argc, char** argv)
     //    << chunk_size << " bytes each." << std::endl;
     // Write the bidding address and chunks
     size_t i = 0;
-    hash_digest_list hashes;
+    hash_list hashes;
     while (infile)
     {
         data_chunk buffer(chunk_size);
@@ -62,7 +61,7 @@ int main(int argc, char** argv)
         // Create a seed.
         BITCOIN_ASSERT(ec_secret_size == hash_size);
         ec_secret secret = bitcoin_hash(buffer);
-        std::cout << libwallet::secret_to_wif(secret) << std::endl;
+        std::cout << secret_to_wif(secret) << std::endl;
     }
     return 0;
 }
