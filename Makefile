@@ -1,5 +1,5 @@
-CXXFLAGS=$(shell pkg-config --cflags libobelisk libwallet) -ggdb
-LIBS=$(shell pkg-config --libs libobelisk libwallet)
+CXXFLAGS=$(shell pkg-config --cflags libbitcoin libbitcoin-client) -ggdb
+LIBS=$(shell pkg-config --libs libbitcoin libbitcoin-client)
 
 default: all
 
