@@ -5,8 +5,11 @@
 #include <bitcoin/client.hpp>
 using namespace bc;
 
+typedef std::shared_ptr<bc::client::obelisk_codec> codec_ptr;
+
 bool stopped = false;
 payment_address payaddr;
+codec_ptr codec;
 
 void error_handler(const std::error_code& ec)
 {
@@ -15,7 +18,7 @@ void error_handler(const std::error_code& ec)
     stopped = true;
 };
 
-void tx_fetched(const std::error_code& ec, const transaction_type& tx)
+void tx_fetched(const transaction_type& tx)
 {
     for (const transaction_input_type& input: tx.inputs)
     {
@@ -55,7 +58,8 @@ void history_fetched(const client::history_list& history)
             if (row.spend.hash != null_hash)
             {
                 std::cout << "Fetching transaction..." << std::endl;
-                //node->blockchain.fetch_transaction(row.spend.hash, tx_fetched);
+                codec->fetch_transaction(error_handler, tx_fetched,
+                    row.spend.hash);
                 return;
             }
         }
@@ -106,49 +110,36 @@ int main(int argc, char** argv)
     }
     typedef std::shared_ptr<bc::client::socket_stream> stream_ptr;
     typedef std::shared_ptr<bc::client::message_stream> base_stream_ptr;
-    typedef std::shared_ptr<bc::client::obelisk_codec> codec_ptr;
 
     stream_ptr stream = std::make_shared<bc::client::socket_stream>(socket);
 
     base_stream_ptr base_stream =
         std::static_pointer_cast<bc::client::message_stream>(stream);
 
-    codec_ptr codec = std::make_shared<bc::client::obelisk_codec>(
+    codec = std::make_shared<bc::client::obelisk_codec>(
         base_stream, on_update, on_unknown);
 
     codec->address_fetch_history(error_handler, history_fetched, payaddr);
 
-    // How should this work?
-#if 0
-    czmqpp::poller poller;
-    poller.add(stream->get_socket());
-    // Use the blockchain.
-    while (!stopped)
+    // Wait for the response:
+    while (codec->outstanding_call_count())
     {
+        czmqpp::poller poller;
+        poller.add(socket);
+
+        // Figure out how much timeout we have left:
         long delay = -1;
         auto next_wakeup = codec->wakeup();
         if (next_wakeup.count())
             delay = static_cast<long>(next_wakeup.count());
 
-        czmqpp::socket which = poller.wait(delay);
-
+        // Sleep:
+        poller.wait(delay);
         if (poller.terminated())
             break;
-
         if (!poller.expired())
-        {
-            if (which == terminal_.get_socket())
-            {
-                command();
-            }
-
-            else if (which == connection_->stream->get_socket())
-            {
-                connection_->stream->signal_response(connection_->codec);
-            }
-        }
+            stream->signal_response(codec);
     }
-#endif
     return 0;
 }
 
