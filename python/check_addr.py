@@ -4,6 +4,28 @@ import sys
 address = None
 client = None
 
+def extract(script):
+  # Sanity check
+  if len(script) == 0: return None
+  # Throw away signature bytes
+  skipbytes = ord(script[0])
+  # Throw away sighash byte
+  skipbytes += 1
+  # Record byte length of pubkey
+  pkbytes = script[skipbytes:skipbytes+1]
+  # Record starting position of pubkey
+  startpk = skipbytes + 1
+  # Store pubkey
+  pk = script[startpk:startpk + ord(pkbytes) ]
+
+  # Sanity check
+  if not (len(pk) == 33 or len(pk) == 65):
+    # Debug
+    print "\n#pkbytes: ", ord(pkbytes), "\nlengthpk: ", len(pk), "\npk: ", pk , "\n"
+    raise Exception("Pubkey length mismatch, something is seriously wrong, blowing up...")
+
+  return pk
+
 def tx_fetched(ec, tx):
     if ec:
         print >> sys.stderr, "Internal error or bad DB:", ec
@@ -14,8 +36,7 @@ def tx_fetched(ec, tx):
         # This is the input script
         print input.script.encode("hex")
         # Extract the public key from the script (begins with 02, 03 or 04)
-        # Hardcoded value for now.
-        public_key = "0206eaa3de705ff69e6cf15bcd3f67dfd33932010dbfb40778c3b4902038e886f9".decode("hex")
+        public_key = extract( input.script )
         # Use obelisk.public_key_to_bc_address(public_key) to get input_address
         input_address = obelisk.public_key_to_bc_address(public_key)
         # Skip input if not the one we're looking for.
