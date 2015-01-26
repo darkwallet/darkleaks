@@ -49,7 +49,7 @@ def main(args):
     global address
     global client
     address = args[0]
-    client = obelisk.ObeliskOfLightClient("tcp://localhost:9091")
+    client = obelisk.ObeliskOfLightClient("tcp://dev.unsystem.net:9091")
     client.fetch_history2(address, history_fetched)
     obelisk.start()
 
