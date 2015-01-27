@@ -1,8 +1,8 @@
-CXXFLAGS=$(shell pkg-config --cflags libbitcoin) -I lib/
+CXXFLAGS=-fPIC $(shell pkg-config --cflags libbitcoin) -I lib/
 LIBS=$(shell pkg-config --libs libbitcoin)
 
 LIBRARY_FILES=\
-    lib/aes256.c \
+    lib/aes256.cpp \
     lib/darkleaks.hpp \
     lib/prove.cpp \
     lib/secrets.cpp \
@@ -63,7 +63,7 @@ lib/darkleaks.a: $(LIBRARY_OBJS)
 	ar rvs lib/darkleaks.a $(LIBRARY_OBJS)
 
 python/darkleaks/_darkleaks.so: python/darkleaks/darkleaks.cpp
-	$(CXX) -fPIC -I/usr/include/python2.7/ -Ilib/ -c python/darkleaks/darkleaks.cpp -o python/darkleaks/darkleaks.o
+	$(CXX) $(CXXFLAGS) -I/usr/include/python2.7/ -Ilib/ -c python/darkleaks/darkleaks.cpp -o python/darkleaks/darkleaks.o
 	$(CXX) -shared -Wl,-soname,_darkleaks.so python/darkleaks/darkleaks.o lib/darkleaks.a -lpython2.7 -lboost_python `pkg-config --libs libbitcoin` -lboost_thread -o python/darkleaks/_darkleaks.so
 
 python_bindings: python/darkleaks/_darkleaks.so

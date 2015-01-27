@@ -1,2 +1,2 @@
-from __darkleaks import *
+from _darkleaks import *
 

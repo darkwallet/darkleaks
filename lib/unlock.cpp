@@ -14,18 +14,6 @@ namespace fs = boost::filesystem;
 
 typedef std::vector<ec_point> ec_point_list;
 
-payment_address bidding_address(const ec_point& pubkey)
-{
-    payment_address payaddr;
-    set_public_key(payaddr, pubkey);
-    return payaddr;
-}
-hash_digest derive_seed(const ec_point& pubkey)
-{
-    data_chunk data(pubkey.begin(), pubkey.end());
-    return bitcoin_hash(data);
-}
-
 void unlock(
     const std::string chunk_filename,
     const std::string pubkey,

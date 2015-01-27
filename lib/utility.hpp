@@ -23,6 +23,18 @@ inline bc::ec_point pubkey_to_point(const std::string& pubkey)
     return point;
 }
 
+inline bc::payment_address bidding_address(const bc::ec_point& pubkey)
+{
+    bc::payment_address payaddr;
+    bc::set_public_key(payaddr, data);
+    return payaddr;
+}
+inline bc::hash_digest derive_seed(const bc::ec_point& pubkey)
+{
+    bc::data_chunk data(pubkey.begin(), pubkey.end());
+    return bitcoin_hash(data);
+}
+
 } // namespace darkleaks
 
 #endif

@@ -4,25 +4,13 @@
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <bitcoin/bitcoin.hpp>
+#include "utility.hpp"
 #include "aes256.h"
 
 namespace darkleaks {
 
 using namespace bc;
 namespace fs = boost::filesystem;
-
-payment_address bidding_address(const ec_point& pubkey)
-{
-    data_chunk data(pubkey.begin(), pubkey.end());
-    payment_address payaddr;
-    set_public_key(payaddr, data);
-    return payaddr;
-}
-hash_digest derive_seed(const ec_point& pubkey)
-{
-    data_chunk data(pubkey.begin(), pubkey.end());
-    return bitcoin_hash(data);
-}
 
 // Encrypt for first hash.
 data_chunk dl_encrypt(data_chunk buffer, hash_digest seed)
