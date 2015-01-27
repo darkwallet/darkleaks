@@ -1,8 +1,13 @@
+#include <darkleaks.hpp>
+
 #include <fstream>
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <bitcoin/bitcoin.hpp>
 #include "aes256.h"
+
+namespace darkleaks {
+
 using namespace bc;
 namespace fs = boost::filesystem;
 
@@ -46,38 +51,13 @@ void test_decryption(const data_chunk& buffer,
     BITCOIN_ASSERT(buffer == cipher);
 }
 
-int main(int argc, char** argv)
+size_t start(
+    const std::string filename,
+    const std::string chunks_path,
+    const size_t chunks)
 {
-    if (argc != 3)
-    {
-        std::cerr << "Usage: dl_start DOCUMENT CHUNKS" << std::endl;
-        std::cerr << "Good default for CHUNKS is 100" << std::endl;
-        return -1;
-    }
-    const fs::path document_full_path = argv[1];
-    const fs::path doc_path = document_full_path.parent_path();
-    const fs::path doc_filename = document_full_path.filename();
-    const std::string chunks_str = argv[2];
-    size_t chunks = 0;
-    try
-    {
-        chunks = boost::lexical_cast<size_t>(chunks_str);
-    }
-    catch (const boost::bad_lexical_cast&)
-    {
-        std::cerr << "dl_start: bad CHUNKS provided." << std::endl;
-        return -1;
-    }
-    const fs::path public_chunks_path =
-        doc_path / (doc_filename.native() + "_public_chunks");
-#if 0
-    if (!fs::create_directory(public_chunks_path))
-    {
-        std::cerr << "dl_start: error creating path '"
-            << public_chunks_path.native() << "'" << std::endl;
-        return -1;
-    }
-#endif
+    const fs::path document_full_path = filename;
+    const fs::path public_chunks_path = chunks_path;
     std::ifstream infile(document_full_path.native(), std::ifstream::binary);
     infile.seekg(0, std::ifstream::end);
     size_t file_size = infile.tellg();
@@ -126,10 +106,8 @@ int main(int argc, char** argv)
         const std::string line = i_str + " " + bid_addr.encoded() + "\n";
         bidfile.write(line.c_str(), line.size());
     }
-    std::cout << i << " chunks created." << std::endl;
-    std::cout << "Choose a future block height and "
-        "a number of chunks to release." << std::endl;
-    std::cout << "Announce them to the world." << std::endl;
-    return 0;
+    return i;
 }
+
+} // namespace darkleaks
 

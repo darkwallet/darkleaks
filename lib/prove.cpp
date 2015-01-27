@@ -1,42 +1,36 @@
+#include <darkleaks.hpp>
+
 #include <fstream>
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <bitcoin/bitcoin.hpp>
 #include "aes256.h"
+
+namespace darkleaks {
+
 using namespace bc;
 namespace fs = boost::filesystem;
 
 typedef std::vector<ec_point> ec_point_list;
 
-int main(int argc, char** argv)
+template <typename DataBuffer>
+std::string data_to_string(const DataBuffer& in)
 {
-    if (argc != 5)
-    {
-        std::cerr << "Usage: dl_prove DOCUMENT CHUNKS BLOCK_HASH REVEAL"
-            << std::endl;
-        return -1;
-    }
-    const fs::path doc_path = argv[1];
-    const std::string chunks_str = argv[2];
-    const std::string reveal_str = argv[4];
-    size_t chunks = 0, reveal = 0;
-    try
-    {
-        chunks = boost::lexical_cast<size_t>(chunks_str);
-        reveal = boost::lexical_cast<size_t>(reveal_str);
-    }
-    catch (const boost::bad_lexical_cast&)
-    {
-        std::cerr << "dl_start: bad CHUNKS or REVEAL provided." << std::endl;
-        return -1;
-    }
-    const data_chunk hash = decode_hex(argv[3]);
-    if (hash.empty() || hash.size() != hash_size)
-    {
-        std::cerr << "dl_prove: not a valid BLOCK_HASH." << std::endl;
-        return -1;
-    }
-    std::ifstream infile(doc_path.native(), std::ifstream::binary);
+    std::string out;
+    out.resize(in.size());
+    for (size_t i = 0; i < in.size(); ++i)
+        out[i] = static_cast<char>(in[i]);
+    return out;
+}
+
+prove_result prove(
+    const std::string document_filename,
+    const size_t chunks,
+    const std::string block_hash,
+    const size_t reveal)
+{
+    prove_result result;
+    std::ifstream infile(document_filename, std::ifstream::binary);
     infile.seekg(0, std::ifstream::end);
     size_t file_size = infile.tellg();
     infile.seekg(0, std::ifstream::beg);
@@ -61,15 +55,19 @@ int main(int argc, char** argv)
         all_pubkeys.push_back(pubkey);
     }
     // Beginning bytes of block hash are zero, so use end bytes.
-    std::seed_seq seq(hash.rbegin(), hash.rend());
+    std::seed_seq seq(block_hash.rbegin(), block_hash.rend());
     index_list random_values(reveal);
     seq.generate(random_values.begin(), random_values.end());
     for (size_t value: random_values)
     {
         size_t index = value % all_pubkeys.size();
-        std::cout << (index + 1) << " "
-            << encode_base16(all_pubkeys[index]) << std::endl;
+        ec_point pubkey = all_pubkeys[index];
+        prove_result_row row{index, data_to_string(pubkey)};
+        // Add row to results.
+        result.push_back(row);
     }
-    return 0;
+    return result;
 }
+
+} // namespace darkleaks
 
