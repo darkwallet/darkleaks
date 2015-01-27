@@ -1,6 +1,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem.hpp>
 #include <darkleaks.hpp>
+#include "utility.hpp"
 
 namespace fs = boost::filesystem;
 
