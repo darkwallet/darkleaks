@@ -22,6 +22,8 @@ Decentralised Information Black Market
 * NO IDENTITY NEEDED.
 * NO INTERACTION WITH LEAKER REQUIRED.
 
+NOTE: Python bindings available! See python/example.py for more info.
+
 See EXPLANATION. Imagine once this is a simple piece of software for
 anyone to use (leaker: import file, add info, prove possession,
 bidder: verify, bid on chunk, unlock) of course running all over Tor
