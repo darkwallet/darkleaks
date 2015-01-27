@@ -1,39 +1,69 @@
-CXXFLAGS=$(shell pkg-config --cflags libbitcoin libbitcoin-client) -ggdb
-LIBS=$(shell pkg-config --libs libbitcoin libbitcoin-client)
+CXXFLAGS=$(shell pkg-config --cflags libbitcoin) -I lib/
+LIBS=$(shell pkg-config --libs libbitcoin)
+
+LIBRARY_FILES=\
+    lib/aes256.c \
+    lib/darkleaks.hpp \
+    lib/prove.cpp \
+    lib/secrets.cpp \
+    lib/start.cpp \
+    lib/unlock.cpp \
+    lib/utility.hpp
+
+LIBRARY_OBJS=\
+    lib/aes256.o \
+    lib/prove.o \
+    lib/secrets.o \
+    lib/start.o \
+    lib/unlock.o
+
+TOOL_FILES=\
+    tools/dl_prove.cpp \
+    tools/dl_secrets.cpp \
+    tools/dl_start.cpp \
+    tools/dl_unlock.cpp \
+    tools/utility.hpp
+
+TOOL_BINS=\
+    bin/dl_prove \
+    bin/dl_secrets \
+    bin/dl_start \
+    bin/dl_unlock
 
 default: all
 
-dl_check_addr.o: dl_check_addr.cpp
+tools/dl_prove.o: tools/dl_prove.cpp tools/utility.hpp
 	$(CXX) -o $@ -c $< $(CXXFLAGS)
-dl_check_addr: dl_check_addr.o
-	$(CXX) -o $@ dl_check_addr.o $(LIBS)
+bin/dl_prove: tools/dl_prove.o
+	mkdir -p bin/
+	$(CXX) -o $@ tools/dl_prove.o lib/darkleaks.a $(LIBS)
 
-dl_unlock.o: dl_unlock.cpp
+tools/dl_secrets.o: tools/dl_secrets.cpp tools/utility.hpp
 	$(CXX) -o $@ -c $< $(CXXFLAGS)
-dl_unlock: dl_unlock.o aes256.o
-	$(CXX) -o $@ dl_unlock.o aes256.o $(LIBS)
+bin/dl_secrets: tools/dl_secrets.o
+	mkdir -p bin/
+	$(CXX) -o $@ tools/dl_secrets.o lib/darkleaks.a $(LIBS)
 
-dl_prove.o: dl_prove.cpp
+tools/dl_start.o: tools/dl_start.cpp tools/utility.hpp
 	$(CXX) -o $@ -c $< $(CXXFLAGS)
-dl_prove: dl_prove.o
-	$(CXX) -o $@ dl_prove.o $(LIBS)
+bin/dl_start: tools/dl_start.o
+	mkdir -p bin/
+	$(CXX) -o $@ tools/dl_start.o lib/darkleaks.a $(LIBS)
 
-aes256.o: aes256.c
-	$(CXX) -o $@ -c $<
-
-dl_secrets.o: dl_secrets.cpp
+tools/dl_unlock.o: tools/dl_unlock.cpp tools/utility.hpp
 	$(CXX) -o $@ -c $< $(CXXFLAGS)
-dl_secrets: dl_secrets.o
-	$(CXX) -o $@ dl_secrets.o $(LIBS)
+bin/dl_unlock: tools/dl_unlock.o
+	mkdir -p bin/
+	$(CXX) -o $@ tools/dl_unlock.o lib/darkleaks.a $(LIBS)
 
-dl_start.o: dl_start.cpp
+lib/*.o: $(LIBRARY_FILES)
 	$(CXX) -o $@ -c $< $(CXXFLAGS)
-dl_start: dl_start.o aes256.o
-	$(CXX) -o $@ dl_start.o aes256.o $(LIBS)
 
-all: dl_start dl_prove dl_unlock dl_secrets dl_check_addr
+lib/darkleaks.a: $(LIBRARY_OBJS)
+	ar rvs lib/darkleaks.a $(LIBRARY_OBJS)
+
+all: lib/darkleaks.a $(TOOL_BINS)
 
 clean:
-	rm -f dl_start dl_prove dl_unlock dl_secrets dl_check_addr 
-	rm -f *.o
+	rm -f lib/*.o tools/*.o
 
