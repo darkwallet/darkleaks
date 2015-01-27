@@ -16,7 +16,7 @@ def checksum(filename):
     f = open(filename)
     return hashlib.sha1(f.read()).hexdigest()
 
-#setup_testdir(chunks_directory)
+setup_testdir(chunks_directory)
 print "Digest of source file:", checksum(source_filename)
 
 actual_chunks = darkleaks.start(source_filename, chunks_directory, 20)
