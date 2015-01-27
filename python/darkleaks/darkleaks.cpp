@@ -9,12 +9,13 @@ python::object prove(
     const std::string block_hash,
     const size_t reveal)
 {
-    python::dict converted;
+    python::list converted;
     auto result = darkleaks::prove(
         document_filename, chunks, block_hash, reveal);
     for (auto row: result)
     {
-        converted[row.index] = row.pubkey;
+        converted.append(python::make_tuple(
+            row.index, row.pubkey));
     }
     return converted;
 }

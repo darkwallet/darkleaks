@@ -36,7 +36,7 @@ prove_result prove(
     const std::string document_filename,
     const size_t chunks,
     const std::string block_hash,
-    const size_t reveal);
+    size_t reveal);
 
 /**
  * USER

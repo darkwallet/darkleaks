@@ -71,5 +71,5 @@ python_bindings: python/darkleaks/_darkleaks.so
 all: lib/darkleaks.a $(TOOL_BINS) python_bindings
 
 clean:
-	rm -f lib/*.o tools/*.o
+	rm -f bin/* lib/*.o lib/*.a tools/*.o python/darkleaks/*.so python/darkleaks/*.o
 

@@ -1,6 +1,7 @@
 #include <darkleaks.hpp>
 
 #include <fstream>
+#include <set>
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <bitcoin/bitcoin.hpp>
@@ -13,12 +14,21 @@ using namespace bc;
 namespace fs = boost::filesystem;
 
 typedef std::vector<ec_point> ec_point_list;
+typedef std::set<size_t> index_set;
+
+size_t cycle(size_t value)
+{
+    if (value == 0)
+        value = std::numeric_limits<size_t>::max();
+    --value;
+    return value;
+}
 
 prove_result prove(
     const std::string document_filename,
     const size_t chunks,
     const std::string block_hash,
-    const size_t reveal)
+    size_t reveal)
 {
     prove_result result;
     std::ifstream infile(document_filename, std::ifstream::binary);
@@ -45,13 +55,27 @@ prove_result prove(
         // Once we spend funds, we reveal the decryption pubkey.
         all_pubkeys.push_back(pubkey);
     }
+    // Avoid infinite loop deadlock.
+    if (reveal > all_pubkeys.size())
+        reveal = all_pubkeys.size();
     // Beginning bytes of block hash are zero, so use end bytes.
     std::seed_seq seq(block_hash.rbegin(), block_hash.rend());
     index_list random_values(reveal);
     seq.generate(random_values.begin(), random_values.end());
+    // Use this to keep track of indexes we've added
+    // to avoid duplicates.
+    index_set ensure_unique;
     for (size_t value: random_values)
     {
         size_t index = value % all_pubkeys.size();
+        // Ensure uniqueness of indexes.
+        while (ensure_unique.find(index) != ensure_unique.end())
+        {
+            value = cycle(value);
+            index = value % all_pubkeys.size();
+        }
+        ensure_unique.insert(index);
+        // Now we have the index.
         ec_point pubkey = all_pubkeys[index];
         prove_result_row row{index, data_to_string(pubkey)};
         // Add row to results.
