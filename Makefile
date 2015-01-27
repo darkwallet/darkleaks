@@ -62,7 +62,13 @@ lib/*.o: $(LIBRARY_FILES)
 lib/darkleaks.a: $(LIBRARY_OBJS)
 	ar rvs lib/darkleaks.a $(LIBRARY_OBJS)
 
-all: lib/darkleaks.a $(TOOL_BINS)
+python/darkleaks/_darkleaks.so: python/darkleaks/darkleaks.cpp
+	$(CXX) -fPIC -I/usr/include/python2.7/ -Ilib/ -c python/darkleaks/darkleaks.cpp -o python/darkleaks/darkleaks.o
+	$(CXX) -shared -Wl,-soname,_darkleaks.so python/darkleaks/darkleaks.o lib/darkleaks.a -lpython2.7 -lboost_python `pkg-config --libs libbitcoin` -lboost_thread -o python/darkleaks/_darkleaks.so
+
+python_bindings: python/darkleaks/_darkleaks.so
+
+all: lib/darkleaks.a $(TOOL_BINS) python_bindings
 
 clean:
 	rm -f lib/*.o tools/*.o
