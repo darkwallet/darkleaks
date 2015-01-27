@@ -49,10 +49,19 @@ for i, pubkey in proofs:
 
 # Now lets stitch the files back together to compare the result.
 output_filename = chunks_directory + "OUTPUT"
-f = open(output_filename, "a")
+data = ""
 for i in range(actual_chunks):
     decrypted_file = chunks_directory + "CHUNK." + str(i) + ".decrypted"
-    f.write(open(decrypted_file).read())
+    data += open(decrypted_file).read()
+
+# OK, now as part of our test in this demo we want to compare both
+# files, so lets detect the size of the source file and then remove
+# the extra padding from the output file.
+source_size = len(open(source_filename).read())
+# Trim the fat.
+data = data[:source_size]
+# Write it out.
+f = open(output_filename, "w").write(data)
 
 print "Rebuilt file digest:", checksum(output_filename)
 
