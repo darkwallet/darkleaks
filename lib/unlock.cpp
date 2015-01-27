@@ -1,8 +1,14 @@
+#include <darkleaks.hpp>
+
 #include <fstream>
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <bitcoin/bitcoin.hpp>
+#include "utility.hpp"
 #include "aes256.h"
+
+namespace darkleaks {
+
 using namespace bc;
 namespace fs = boost::filesystem;
 
@@ -10,9 +16,8 @@ typedef std::vector<ec_point> ec_point_list;
 
 payment_address bidding_address(const ec_point& pubkey)
 {
-    data_chunk data(pubkey.begin(), pubkey.end());
     payment_address payaddr;
-    set_public_key(payaddr, data);
+    set_public_key(payaddr, pubkey);
     return payaddr;
 }
 hash_digest derive_seed(const ec_point& pubkey)
@@ -21,27 +26,13 @@ hash_digest derive_seed(const ec_point& pubkey)
     return bitcoin_hash(data);
 }
 
-int main(int argc, char** argv)
+void unlock(
+    const std::string chunk_filename,
+    const std::string pubkey,
+    const std::string decrypt_extension)
 {
-    if (argc != 4)
-    {
-        std::cerr << "Usage: dl_unlock CHUNKFILE BLOCK_HASH PUBKEY"
-            << std::endl;
-        return -1;
-    }
-    const std::string chunk_filename = argv[1];
-    const data_chunk hash = decode_hex(argv[2]);
-    if (hash.empty() || hash.size() != hash_size)
-    {
-        std::cerr << "dl_unlock: not a valid BLOCK_HASH." << std::endl;
-        return -1;
-    }
-    const ec_point pubkey = decode_hex(argv[3]);
-    if (pubkey.empty() || pubkey.size() != ec_compressed_size)
-    {
-        std::cerr << "dl_unlock: not a valid PUBKEY." << std::endl;
-        return -1;
-    }
+    // Convert string type to point.
+    ec_point pubkey_point = pubkey_to_point(pubkey);
     std::ifstream infile(chunk_filename, std::ifstream::binary);
     infile.seekg(0, std::ifstream::end);
     size_t file_size = infile.tellg();
@@ -54,8 +45,8 @@ int main(int argc, char** argv)
     infile.read(data, file_size);
     infile.close();
     // Get seed.
-    payment_address bid_addr = bidding_address(pubkey);
-    hash_digest seed = derive_seed(pubkey);
+    payment_address bid_addr = bidding_address(pubkey_point);
+    hash_digest seed = derive_seed(pubkey_point);
     // Decrypt chunk.
     aes256_context ctx; 
     BITCOIN_ASSERT(seed.size() == 32);
@@ -69,7 +60,7 @@ int main(int argc, char** argv)
     std::ofstream outfile(new_chunk_filename.native(), std::ifstream::binary);
     char* dec_data = reinterpret_cast<char*>(cipher.data());
     outfile.write(dec_data, cipher.size());
-    return 0;
 }
 
+} // namespace darkleaks
 

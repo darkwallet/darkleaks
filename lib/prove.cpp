@@ -4,6 +4,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <bitcoin/bitcoin.hpp>
+#include "utility.hpp"
 #include "aes256.h"
 
 namespace darkleaks {
@@ -12,16 +13,6 @@ using namespace bc;
 namespace fs = boost::filesystem;
 
 typedef std::vector<ec_point> ec_point_list;
-
-template <typename DataBuffer>
-std::string data_to_string(const DataBuffer& in)
-{
-    std::string out;
-    out.resize(in.size());
-    for (size_t i = 0; i < in.size(); ++i)
-        out[i] = static_cast<char>(in[i]);
-    return out;
-}
 
 prove_result prove(
     const std::string document_filename,
