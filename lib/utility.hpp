@@ -32,7 +32,7 @@ inline bc::payment_address bidding_address(const bc::ec_point& pubkey)
 inline bc::hash_digest derive_seed(const bc::ec_point& pubkey)
 {
     bc::data_chunk data(pubkey.begin(), pubkey.end());
-    return bitcoin_hash(data);
+    return bc::bitcoin_hash(data);
 }
 
 } // namespace darkleaks
