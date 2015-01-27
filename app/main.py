@@ -1,5 +1,8 @@
+import os
 import sys
-sys.path.append("../python/")
+include_path = os.path.dirname(os.path.realpath(__file__)) + "/../python/"
+sys.path.append(include_path)
+# All sub-modules below this line will now be able to import darkleaks module!
 import darkleaks
 
 def main(args):
