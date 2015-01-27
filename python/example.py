@@ -43,10 +43,8 @@ proofs = darkleaks.prove(
 # need to unlock chunks.
 
 # Just iterate chunk files.
-for i in range(1, actual_chunks):
+for i, pubkey in proofs:
     chunk_filename = chunks_directory + "CHUNK." + str(i)
-    print chunk_filename
-    pubkey = proofs[i]
     darkleaks.unlock(chunk_filename, pubkey, ".decrypted")
 
 # Now lets stitch the files back together to compare the result.

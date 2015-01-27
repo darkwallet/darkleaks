@@ -66,10 +66,10 @@ size_t start(
         // Copy chunk to public chunk file.
         char* data = reinterpret_cast<char*>(buffer.data());
         infile.read(data, chunk_size);
-        ++i;
         const std::string i_str = boost::lexical_cast<std::string>(i);
         const fs::path chunk_filename =
             public_chunks_path / (std::string("CHUNK.") + i_str);
+        ++i;
         std::ofstream outfile(chunk_filename.native(), std::ifstream::binary);
         // Create a seed.
         BITCOIN_ASSERT(ec_secret_size == hash_size);

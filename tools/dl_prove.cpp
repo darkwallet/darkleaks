@@ -38,7 +38,7 @@ int main(int argc, char** argv)
         document_filename, chunks, hash, reveal);
     for (const auto row: result)
     {
-        std::cout << (row.index + 1) << " "
+        std::cout << row.index << " "
             << hexify(row.pubkey) << std::endl;
     }
     return 0;
