@@ -6,6 +6,8 @@
 
 namespace darkleaks {
 
+typedef std::vector<std::string> string_list;
+
 /**
  * LEAKER
  * 1. Split file up into N chunks.
@@ -49,7 +51,7 @@ void unlock(
  * LEAKER
  * 4. Claim Bitcoins and thereby unlock file.
  */
-void secrets(
+string_list secrets(
     const std::string document_filename,
     const size_t chunks);
 
