@@ -1,13 +1,18 @@
 Install the libbitcoin dependencies from:
 
-  http://github.com/libbitcoin/
+  http://github.com/libbitcoin/libbitcoin/
 
-Will install the tools in your home directory. Be sure to follow the
-instructions at the end of the installation.
+And python-obelisk from:
+
+  http://github.com/darkwallet/python-obelisk/
 
 Now you should be able to compile this project:
 
   $ make
 
 See README for usage info.
+
+Tools will be built inside bin/
+
+Python bindings are available under python/. See example.py for more info.
 
