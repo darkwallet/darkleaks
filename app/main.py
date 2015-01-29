@@ -1,22 +1,13 @@
-import os
-import sys
+import os,sys
 include_path = os.path.dirname(os.path.realpath(__file__)) + "/../python/"
 sys.path.append(include_path)
 # All sub-modules below this line will now be able to import darkleaks module!
 import darkleaks
-
-import shutil
-import hashlib
 from PyQt4 import QtGui, QtCore
+from guiutil import *
 
-def setup_testdir(path):
-    if os.path.isdir(path):
-        shutil.rmtree(path)
-    os.makedirs(path)
-
-def checksum(filename):
-    f = open(filename)
-    return hashlib.sha1(f.read()).hexdigest()
+#global
+actual_chunks = None
 
 def showDialog(parent, qlabel):
     fname = QtGui.QFileDialog.getOpenFileName(parent, 'Open file', './')
@@ -29,8 +20,6 @@ def showDialogDir(parent, qlabel):
 def showDialogText(self, qlabel, titleText, prompt):
     text, ok = QtGui.QInputDialog.getText(self, titleText, prompt)
     if ok: qlabel.setText(str(text))
-
-actual_chunks = None
 
 def getChunks(source_filename, number_chunks, chunks_directory, console):
   global actual_chunks
