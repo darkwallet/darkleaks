@@ -1,57 +1,71 @@
 from __init__ import *
 
-def init(self): #init form controls
+def init(): #init form controls
+
+    background = QtGui.QPixmap()
+    background.load('./app/assets/walletlogo.png')
+    bigone = QtGui.QLabel('',self)
+    bigone.setPixmap(background)
+    bigone.move(0,0)
+
+    #self.render(bigone,QtCore.QPoint(), QtGui.QRegion(self.rect()), QtGui.QWidget.DrawWindowBackground)
+    apptitle = QtGui.QLabel('DarkLeaks v0.0601',self)
+    titlefont = QtGui.QFont("Times", 36, QtGui.QFont.Bold)
+    apptitle.setFont(titlefont)
+    apptitle.move(100, 20)
+
+    normalfont = QtGui.QFont("Times", 12, QtGui.QFont.Bold)
 
     openFile = QtGui.QPushButton('Choose source file', self)
-    openFile.move(20, 10)
+    openFile.move(30, 350)
 
     openDir = QtGui.QPushButton('Choose chunks dir', self)
-    openDir.move(20, 40)
+    openDir.move(30, 380)
 
     chooseChunks = QtGui.QPushButton('Choose # of chunks (default 100)', self)
-    chooseChunks.move(20, 70)
+    chooseChunks.move(30, 410)
 
     blockHashDialog = QtGui.QPushButton('Choose blockhash', self)
-    blockHashDialog.move(20, 100)
+    blockHashDialog.move(30, 440)
 
     revealChunks = QtGui.QPushButton('Choose # of chunks to reveal (default 10)', self)
-    revealChunks.move(20, 130)
+    revealChunks.move(30, 470)
 
     consoleText = QtGui.QTextEdit(self)
-    consoleText.move(150, 400)
+    consoleText.setGeometry(325,325, 465, 225)
     consoleText.setReadOnly(True)
 
     generateButton = QtGui.QPushButton('Generate Chunks', self)
     generateButton.setCheckable(True)
-    generateButton.move(230, 10)
+    generateButton.move(335, 290)
 
     proofsButton = QtGui.QPushButton('Generate Proofs', self)
     proofsButton.setCheckable(True)
-    proofsButton.move(230, 40)
+    proofsButton.move(455, 290)
 
     secretsButton = QtGui.QPushButton('Generate Secrets', self)
     secretsButton.setCheckable(True)
-    secretsButton.move(230, 70)
+    secretsButton.move(565, 290)
 
     sourceFile = QtGui.QLabel('please select a source file',self)
-    sourceFile.setGeometry(40,200, 500, 40)
-    sourceFile.move(20,200)
+    sourceFile.setFont(normalfont)
+    sourceFile.setGeometry(50,100, 800, 40)
 
     chunksDir = QtGui.QLabel('please select a chunks directory',self)
-    chunksDir.setGeometry(40,200, 500, 40)
-    chunksDir.move(20,220)
+    chunksDir.setFont(normalfont)
+    chunksDir.setGeometry(50,125, 800, 40)
 
     numChunks = QtGui.QLabel('100',self)
-    numChunks.setGeometry(40,200, 500, 40)
-    numChunks.move(20,240)
+    numChunks.setFont(normalfont)
+    numChunks.setGeometry(50,150, 800, 40)
 
     blockHash = QtGui.QLabel('please add a blockhash',self)
-    blockHash.setGeometry(40,200, 500, 40)
-    blockHash.move(20,260)
+    blockHash.setFont(normalfont)
+    blockHash.setGeometry(50,175, 800, 40)
 
     numChunksReveal = QtGui.QLabel('10',self)
-    numChunksReveal.setGeometry(40,200, 500, 40)
-    numChunksReveal.move(20,280)
+    numChunksReveal.setFont(normalfont)
+    numChunksReveal.setGeometry(50,200, 800, 40)
 
     openFile.clicked.connect(lambda : showDialog(self, sourceFile))
     openDir.clicked.connect(lambda : showDialogDir(self, chunksDir))
@@ -69,8 +83,13 @@ def init(self): #init form controls
 
     qbtn = QtGui.QPushButton('Quit', self)
     qbtn.clicked.connect(QtCore.QCoreApplication.instance().quit)
-    qbtn.move(50, 600)       
+    #grid.addWidget(qbtn,2,2)
+    qbtn.move(685, 550)       
+    
+    screen = QtGui.QDesktopWidget().screenGeometry()      
+    width = 800
+    height = 600
 
-    self.setGeometry(50, 50, 700, 700)
-    self.setWindowTitle('DarkLeaks UI v1')
+    self.setGeometry( (screen.width() - width) / 2 , (screen.height() - height) / 2 , width, height)
+    self.setWindowTitle('DarkLeaks UI v0.0601')
 

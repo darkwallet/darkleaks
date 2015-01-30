@@ -1,5 +1,8 @@
 from __init__ import *
 
+def getTimeStr():
+    return time.ctime().split(" ")[-2] + ": "
+
 def showError(title, msg):
     QtGui.QMessageBox(QtGui.QMessageBox.Warning, title, msg, QtGui.QMessageBox.No, self).show()
 

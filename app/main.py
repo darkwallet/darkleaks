@@ -3,7 +3,7 @@ from __init__ import *
 def main(args):
     #print "hello!", args
 
-    init(self)
+    init()
     
     self.show()
 
