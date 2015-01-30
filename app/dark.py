@@ -16,9 +16,8 @@ def check(a,b,c,text,console):
   if error: 
     error = "Can\'t do that right now. Please " + error + " and try again."
     showError("Action failed", error)
-    console.setText(error)
+    console.append(getTimeStr() + error)
 
-  print error, a, text
   return error
 
 def getChunks(source_filename, number_chunks, chunks_directory, console):
@@ -30,10 +29,10 @@ def getChunks(source_filename, number_chunks, chunks_directory, console):
   #print source_filename, chunks_directory, number_chunks, '\n'
 
   setup_testdir(chunks_directory)
-  console.setText("Digest of source file: " + checksum(source_filename))
+  console.append(getTimeStr() + "Digest of source file: " + checksum(source_filename))
 
   actual_chunks = darkleaks.start(source_filename, chunks_directory, number_chunks)
-  console.setText("Created " + str(actual_chunks) + "chunks.")
+  console.append(getTimeStr() + "Created " + str(actual_chunks) + "chunks.")
 
 def getProofs(source_filename, number_chunks, chunks_directory, block_hash, reveal_chunks, console):
   global actual_chunks
@@ -62,10 +61,10 @@ def getProofs(source_filename, number_chunks, chunks_directory, block_hash, reve
 
   f = open(output_filename, "w").write(data)
 
-  console.setText("Rebuilt file digest: " + checksum(output_filename))
+  console.append(getTimeStr() + "Rebuilt file digest: " + checksum(output_filename))
 
 def getSecrets(source_filename, number_chunks, console):
   if check(False,True, False, source_filename, console): return
 
   secret_keys = darkleaks.secrets(source_filename, number_chunks)
-  console.setText(str(secret_keys))
+  console.append(getTimeStr() + str(secret_keys))
