@@ -1,0 +1,73 @@
+language:
+    - cpp
+
+os:
+    - osx
+    - linux
+
+compiler:
+    - clang
+    - gcc
+
+env:
+    #- LINK=static
+    - LINK=dynamic
+
+matrix:
+    exclude:
+        - os: osx
+          compiler: gcc
+    fast_finish:
+        - true
+
+before_install:
+    # Set aliases for readability.
+    - if [[ $CC             == gcc     ]]; then GCC=true; fi
+    - if [[ $CC             == clang   ]]; then CLANG=true; fi
+    - if [[ $LINK           == static  ]]; then STATIC=true; fi
+    - if [[ $LINK           == dynamic ]]; then DYNAMIC=true; fi
+    - if [[ $TRAVIS_OS_NAME == osx     ]]; then OSX=true; fi
+    - if [[ $TRAVIS_OS_NAME == linux   ]]; then LINUX=true; fi
+
+    # Set package repository.
+    - if [[ $LINUX           ]]; then sudo add-apt-repository -y ppa:boost-latest/ppa; fi
+    - if [[ $LINUX           ]]; then sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test; fi
+    - if [[ $LINUX           ]]; then sudo add-apt-repository -y ppa:yjwong/cmake; fi
+    - if [[ $LINUX && $CLANG ]]; then sudo add-apt-repository -y ppa:h-rayflood/llvm; fi
+
+    # Update the system.
+    - if [[ $LINUX           ]]; then sudo apt-get -qq update; fi
+
+install:
+    # Install g++ 4.8
+    - if [[ $LINUX           ]]; then sudo apt-get install -qq g++-4.8 --allow-unauthenticated; fi
+    - if [[ $LINUX           ]]; then sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 50; fi
+    - if [[ $LINUX           ]]; then sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 50; fi
+
+    # Install clang++ 3.4
+    - if [[ $LINUX && $CLANG ]]; then sudo apt-get install -qq clang-3.4 --allow-unauthenticated; fi
+    - if [[ $LINUX && $CLANG ]]; then sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-3.4 50; fi
+    - if [[ $LINUX && $CLANG ]]; then sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-3.4 50; fi
+
+    # Install boost for linux
+    - if [[ $LINUX           ]]; then sudo apt-get -qq install boost1.54; fi
+
+    # Download and build libbitcoin and all dependencies.
+    - git clone https://github.com/libbitcoin/libbitcoin.git
+    - cd libbitcoin
+    - if [[ $OSX   && $CLANG && $STATIC  ]]; then sudo ./install.sh --enable-testnet --disable-shared --build-boost --prefix=$HOME/my-prefix; fi
+    - if [[ $LINUX && $CLANG && $STATIC  ]]; then sudo ./install.sh --disable-shared CXXFLAGS='-Os -stdlib=libstdc++' LDLIBS='-lstdc++'; fi
+    - if [[ $LINUX && $GCC   && $STATIC  ]]; then sudo ./install.sh --disable-ndebug --disable-shared --build-dir=my-build CXXFLAGS='-Os -s'; fi
+    - if [[ $OSX   && $CLANG && $DYNAMIC ]]; then sudo ./install.sh ; fi
+    - if [[ $LINUX && $CLANG && $DYNAMIC ]]; then sudo CXX=$CXX CC=$CC ./install.sh --disable-ndebug --disable-static CXXFLAGS='-Os -stdlib=libstdc++' LDLIBS='-lstdc++'; fi
+    - if [[ $LINUX && $GCC   && $DYNAMIC ]]; then sudo CXX=$CXX CC=$CC ./install.sh --disable-static CXXFLAGS='-Os -s'; fi
+
+    # Install cmake 2.8.12
+    - if [[ $LINUX           ]]; then sudo apt-get remove cmake && sudo apt-get clean && sudo apt-get autoclean && sudo apt-get -qq install cmake; fi
+
+script:
+    - cd ..
+    - mkdir build
+    - cd build
+    - if [[ $DYNAMIC  ]]; then cmake .. && make -j 2 && sudo make install; fi
+    - if [[ $STATIC   ]]; then cmake .. -DBUILD_SHARED_LIBS=OFF && make -j 2 && sudo make install; fi
