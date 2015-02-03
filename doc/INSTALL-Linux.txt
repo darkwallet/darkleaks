@@ -1,0 +1,74 @@
+This instructions have only been tested with openSUSE 13.1,
+but should work with any recent Linux.
+
+################# Dependencies #################
+# install general developer tools:
+- cmake
+
+# install darkleaks library dependencies
+- libboost-all-dev
+- libbitcoin:
+ git clone git@github.com:libbitcoin/libbitcoin.git
+ cd libbitcoin
+ sudo ./install.sh
+
+# install darkleaks Python UI dependencies (optional)
+Qt4 PyQt4
+
+################# Get opentxs ##################
+# git pull from master branch
+$ git clone git@github.com:darkwallet/darkleaks.git
+
+# to clean and reset to HEAD:
+$ git clean -fxd
+$ git reset --hard HEAD
+
+$ cd opentxs
+$ mkdir build && cd build
+
+
+##################   Build   ###################
+$ cmake ..
+$ make -j2
+
+Build Multithreaded, need about 1gb of ram per thread.
+-j (int)
+
+
+####################   Run   ###################
+# Run the Python GUI (from the build directory):
+python2 app/main.py
+
+
+##############   CMake Options:   ##############
+
+Set install dir: -DCMAKE_INSTALL_PREFIX=/home/your/prefix/
+(Default is /usr/local)
+
+Build static:	 -DBUILD_SHARED_LIBS=OFF
+
+Debug Mode:	 -DCMAKE_BUILD_TYPE=Debug
+(Default is Release)
+
+Build Packages:
+       RPM:      -DRPM=ON
+       DEB:      -DDEB=ON
+
+You can't build an RPM and do an install to a custom directory (CMAKE_INSTALL_PREFIX) with the same build.
+
+
+##################   Install   #################
+## Install
+$ sudo make install
+
+## Link the library
+$ sudo ldconfig
+
+## Build (RPM/DEB/TAR) package
+$ make package
+
+If no package is set, it will build a tar-ball.
+
+
+###########   Miscellaneous Notes:   ###########
+Donate to unSYSTEM: https://www.darkwallet.is/donate/
